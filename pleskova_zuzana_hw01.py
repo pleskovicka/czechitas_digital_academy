@@ -4,28 +4,19 @@ import json
 with open('alice.txt', encoding='utf-8') as file:
     text1 = file.read().lower()
 
-# pomocou nasledujucich dvoch krokov sa zbavim medzier a znakov pre novy riadok:
-text2 = text1.replace(" ", "")
-text = text2.replace("\n", "")
+# pomocou tohto kroku sa zbavim medzier a znakov pre novy riadok:
+text = text1.replace(" ", "").replace("\n", "")
 
-# vytvorim si prazdne premenne, ktore potrebujem pre nasledujuce cykly:
-pocet = 0
-znaky = []
+# vytvorim si prazdny slovnik, ktory potrebujem pre cyklus:
 slovnik = dict()
 
-# vytvorim si zoznam jedinecnych znakov v retazci:
+# do slovniku pomocou cyklu pridavam jedinecne znaky z textu a zaroven pocitam ich vyskyt v texte ak je vacsi nez 1:
 for znak in text:
-    if znak not in znaky:
-        znaky.append(znak)
-
-# vytvorim si slovnik zo zoznamu jedinecnych znakov a dam im vsetkym hodnotu "0":
-for znak in znaky:
-    slovnik[znak] = 0
-
-# spocitam opakovania/pocet jednotlivych znakov a ulozim ich do slovniku:
-for znak in text:
-    slovnik[znak] += 1
+    if znak in slovnik:
+        slovnik[znak] += 1
+    else:
+        slovnik[znak] = 1   
 
 # ulozim vysledny slovnik do suboru _.json:
 with open('hw01_output.json', mode='w', encoding='utf-8') as file:
-    json.dump(slovnik, file, indent = 2, ensure_ascii = False, sort_keys = True)
+    json.dump(slovnik, file, indent=2, ensure_ascii=False, sort_keys=True)
