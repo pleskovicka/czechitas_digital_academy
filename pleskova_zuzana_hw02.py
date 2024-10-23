@@ -24,6 +24,8 @@ o nulové délce [""].
 Dekáda je vždy první rok desetiletí, např. rok 1987 patří do dekády 1980 a rok 2017 do dekády 2010.
 '''
 
+# RIESENIE:
+
 import json
 
 netflix_movies = []
@@ -45,10 +47,9 @@ with open("netflix_titles.tsv", encoding="utf-8") as input_file:
         netflix_movies.append(row_dict)
 print(keys)
 
-# vytvorim (nove) kluce, ktore ma zaujimaju a podla nich vyberiem zo suboru len to, 
-# co do slovnikov potrebujem:
+# vytvorim (nove) kluce, ktore ma zaujimaju a podla nich vyberiem zo suboru len to, co do slovnikov potrebujem:
 keys1 = ["title"]  # tieto ako retazce
-keys2 = ["directors", "cast", "genres"]  # tieto stpce chcem ako zoznamy
+keys2 = ["directors", "cast", "genres"]  # tieto stlpce chcem ako zoznamy
 movies = []
 for dc in netflix_movies:
     new_dict = dict()
