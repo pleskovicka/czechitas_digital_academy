@@ -24,50 +24,73 @@ o nulové délce [""].
 Dekáda je vždy první rok desetiletí, např. rok 1987 patří do dekády 1980 a rok 2017 do dekády 2010.
 '''
 
-# RIESENIE:
+# RIESENIE PODLA PRVYCH KOMENTAROV:
+'''
+.Na řádku 35 zavádíš proměnou new_keys, kterou na řádku 40 uložíš do proměnné keys. Nebála bych se, pojmenovat ji keys rovnou 
+na začátku a toto přeuložení už nemusíš dělat.
+.Na řádku 48 zůstal zapomenutý print(keys) – do terminálu se nemá nic vypisovat.
+.Líbí se mi, že sis zvlášť načetla první řádek jako hlavičku a data do druhé proměnné.
+.Doporučila bych ale do bloku with open zařadit jen řádek 34 a řádky 42 a 43, které načítají data ze souboru a dále pokračovat 
+novým blokem kódu bez odsazení – soubor se tak po načtení zavře. To vyžaduje úpravu proměnné values. Ideální by bylo ji definovat 
+jako prázdný seznam před otevřením souboru a jednotlivé řádky do ní načíst pomocí metody append.
+.Takto budeš mít dva seznamy keys a values a můžeš je spojit do slovníku row_dict pomocí funkce zip. Bude nutné definovat opět 
+for cyklus, který bude procházet seznam values a brát z něj jednotlivé seznamy value po jednom a k němu připojovat odpovídající 
+klíče ze seznamu keys. Syntax je dict(zip(keys, value). Jednotlivé slovníky pak můžeš postupně připojovat do prázdného seznamu 
+netflix_movies zase pomocí append. 
+.Pořadí sloupců podle zadání by mělo být title, directors, cast, genres, decade. Máš to přehozené, 
+protože jak python prochází kódem, 
+tak si bere údaje z originálního pořadí sloupců, které je seřazené jinak, než potřebujeme my. To by se dalo vyřešit předdefinováním 
+struktury slovníku new_dict na řádku 55 – tedy nezavedeš jen prázdný slovník, ale rozepíšeš jednotlivé názvy klíčů a k nim odpovídající předpokládané 
+hodnoty ( např. "title": ""). Pořadí zůstane zachované, tak jak zadáš ty a nemusíš tedy ani na řádku 64 spouštět nový for cyklus. 
+Slovník poté plníš hodnotami pomocí kódu od řádku 56.
+.Vícenásobné podmínky můžeš řešit pomocí elif.
+.Líbí se mi podmínka, která řeší prázdný slovník pro sloupce directors,…
+.Správně jsi vyřešila dekádu letopočtu na řádku 66, ale zůstaly tam jedny závorky navíc. Pokud bys výsledek dělení nechtěla 
+přetypovat znovu na int, můžeš místo dělení použít dělení beze zbytku //, které vrací celé číslo.
+'''
+
 
 import json
 
-netflix_movies = []
+# Nacitam prvy riadok s nazvami stlpcov do premennej COL_NAMES a ostatne riadky do zoznamu VALUES:
+values = []
 with open("netflix_titles.tsv", encoding="utf-8") as input_file:
-    # Nacitam prvy riadok s nazvami stlpcov -> kluce slovnikov a zaroven niektore znenie opravim podla zadania:
-    old_keys = input_file.readline().lower().strip().split("\t")
-    new_keys = []
-    for key in old_keys:
-        new_key = key.replace("director", "directors").replace(
-            "primarytitle", "title")
-        new_keys.append(new_key)
-    keys = new_keys
-    # Nacitam zvysne riadky a ulozim ich do slovnikov s novymi klucmi:
+    col_names = input_file.readline().lower().strip().split("\t")
     for line in input_file:
-        values = line.strip().split("\t")
-        row_dict = dict()
-        for no in range(len(keys)):
-            row_dict[keys[no]] = values[no]
-        netflix_movies.append(row_dict)
-print(keys)
+        values.append(line.strip().split("\t"))
 
-# vytvorim (nove) kluce, ktore ma zaujimaju a podla nich vyberiem zo suboru len to, co do slovnikov potrebujem:
+# Ulozim si nove kluce pozadovane v zadani ulohy:
+keys = []
+for key in col_names:
+    new_key = key.replace("director", "directors").replace(
+        "primarytitle", "title")
+    keys.append(new_key)
+
+# vytvorim z novych klucov a riadkov povodneho dokumentu zoznam slovnikov:
+netflix_movies = []
+for list in values:
+    row_dict = dict(zip(col_names, list))
+    netflix_movies.append(row_dict)
+
+# upravim podla zadania format "stlpcov" a vypocitam dekadu:
 keys1 = ["title"]  # tieto ako retazce
 keys2 = ["directors", "cast", "genres"]  # tieto stlpce chcem ako zoznamy
 movies = []
-for dc in netflix_movies:
-    new_dict = dict()
-    for key, value in dc.items():
+for dictionary in netflix_movies:
+    new_dict = {"title": "", "directors": [],
+                "cast": [], "genres": [], "decade": int}
+    for key, value in dictionary.items():
         if key in keys1:
             new_dict[key] = value
-        if key in keys2:
+        elif key in keys2:
             new_dict[key] = value.split(",")
             if value == "":
                 new_dict[key] = []
-    # schvalne zacinam novy cyklus, pretoze chcem aby kluc dekady bol na konci slovniku:
-    for key, value in dc.items():
-        if key == "startyear":
-            dec = int((int(value)/10))*10
+        elif key == "startyear":
+            dec = int(value)//10*10
             new_dict["decade"] = dec
-
     movies.append(new_dict)
 
-# ulozim vysledny slovnik do suboru _.json:
+# ulozim vysledny zoznam slovnikov do suboru _.json:
 with open('hw02_output.json', mode='w', encoding='utf-8') as file:
     json.dump(movies, file, indent=2, ensure_ascii=False, sort_keys=False)
