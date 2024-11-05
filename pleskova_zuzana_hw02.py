@@ -59,17 +59,17 @@ with open("netflix_titles.tsv", encoding="utf-8") as input_file:
     for line in input_file:
         values.append(line.strip().split("\t"))
 
-# Ulozim si nove kluce pozadovane v zadani ulohy:
+# Ulozim si nove kluce pozadovane v zadani ulohy ako premennu KEYS:
 keys = []
 for key in col_names:
     new_key = key.replace("director", "directors").replace(
         "primarytitle", "title")
     keys.append(new_key)
 
-# vytvorim z novych klucov a riadkov povodneho dokumentu zoznam slovnikov:
+# vytvorim z novych klucov a riadkov povodneho dokumentu zoznam slovnikov NETFLIX_MOVIES:
 netflix_movies = []
-for list in values:
-    row_dict = dict(zip(col_names, list))
+for row in values:
+    row_dict = dict(zip(keys, row))
     netflix_movies.append(row_dict)
 
 # upravim podla zadania format "stlpcov" a vypocitam dekadu:
@@ -77,8 +77,13 @@ keys1 = ["title"]  # tieto ako retazce
 keys2 = ["directors", "cast", "genres"]  # tieto stlpce chcem ako zoznamy
 movies = []
 for dictionary in netflix_movies:
-    new_dict = {"title": "", "directors": [],
-                "cast": [], "genres": [], "decade": int}
+    new_dict = {
+                    "title": "", 
+                    "directors": [],
+                    "cast": [], 
+                    "genres": [], 
+                    "decade": int
+    }
     for key, value in dictionary.items():
         if key in keys1:
             new_dict[key] = value
@@ -91,6 +96,6 @@ for dictionary in netflix_movies:
             new_dict["decade"] = dec
     movies.append(new_dict)
 
-# ulozim vysledny zoznam slovnikov do suboru _.json:
-with open('hw02_output.json', mode='w', encoding='utf-8') as file:
+# ulozim vysledny zoznam slovnikov do suboru hw02_output.json:
+with open("hw02_output.json", mode=("w", encoding="utf-8") as file:
     json.dump(movies, file, indent=2, ensure_ascii=False, sort_keys=False)
